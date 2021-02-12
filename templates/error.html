@@ -1,0 +1,12 @@
+{% extends "template.html" %}
+
+{% block title %}
+    ERROR!!!
+{% endblock %}
+
+{% block main %}
+    <form action="/">
+        <h2 align='center' ><b>  {{ message }} </b></h2>
+        <button class="btn btn-primary" type="submit">Home</button>
+    </form>
+{% endblock %}

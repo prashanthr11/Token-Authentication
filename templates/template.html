@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/styles.css" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+        <title>Welcome!</title>
+
+        <body id = "body_bg">
+            <nav class="navbar navbar-expand-md navbar-light bg-light border" align='center'>
+            <a href = "/"><img src="/static/logo.jpeg" alt = "logo" width = "100" height = "75"></a>
+            <h3 style="text-align: center"> Token Verifier  </h3>
+            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar" data-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
+
+                <ul class="navbar-nav ml-auto mt-2" align="center">
+                    <li class="nav-item"><a class="nav-link" href="/"> <b>Home</b></a></li>
+                </ul>
+            </div>
+        </nav>
+            <main class="container p-5">
+                {% block main %}{% endblock %}
+            </main>
+        </body>
+</html>
