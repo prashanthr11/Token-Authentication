@@ -29,6 +29,7 @@ Session(app)
 
 # Connect to the database
 cur = connect("Project.db")
+db = cur.cursor()
 
 
 # This the path for our homepage
@@ -42,7 +43,7 @@ def verifyToken(token, now):
     In this function, we are going to fetch all the users with the given tokenid. If there is only one user we just return true else false in all other cases.
     """
     try:
-        rows = cur.execute("SELECT UserID FROM Users where UserID IN(SELECT UserID FROM Tokens where TokenID = ?)",
+        rows = db.execute("SELECT UserID FROM Users where UserID IN(SELECT UserID FROM Tokens where TokenID = ?)",
                            (token,))
         rows = rows.fetchall()
         if len(rows) == 1:
@@ -59,7 +60,7 @@ def getUsername(uid):
     """
     Query and return the DB for the username on basis of userid.
     """
-    return cur.execute("SELECT Username FROM Users WHERE UserID = ?", (uid,))
+    return db.execute("SELECT Username FROM Users WHERE UserID = ?", (uid,))
 
 
 def generateToken(timenow):
@@ -74,7 +75,7 @@ def storeToken(token, expirydate, uid):
     Insert tokenid, userid, expirydate into the tokens table.
     """
     params = (token, uid, expirydate)
-    cur.execute("INSERT INTO Tokens (TokenID, UserID, EXPIRYDATE) VALUES(?, ?, ?)", params)
+    db.execute("INSERT INTO Tokens (TokenID, UserID, EXPIRYDATE) VALUES(?, ?, ?)", params)
     cur.commit()
     return token
 
@@ -85,7 +86,7 @@ def isvalidtoken(uid, token):
     """
     try:
         timenow = datetime.now().strftime("%m/%d/%Y, %H:%M:%S").replace(',', '')
-        rows = cur.execute("SELECT EXPIRYDATE FROM Tokens where TokenID = ? AND UserID = ?", (token, uid))
+        rows = db.execute("SELECT EXPIRYDATE FROM Tokens where TokenID = ? AND UserID = ?", (token, uid))
         rows = rows.fetchall()
         for row in rows[0]:
             if row < timenow:  # comparison between string returns True if the Token is not expired else False.
@@ -101,7 +102,7 @@ def updateToken(token, uid):
     Insert the data into the Tokens table.
     """
     try:
-        rows = cur.execute("UPDATE Tokens SET EXPIRYDATE = ? WHERE TokenID = ? AND UserID = ?)",
+        rows = db.execute("UPDATE Tokens SET EXPIRYDATE = ? WHERE TokenID = ? AND UserID = ?)",
                            (generateToken(datetime.now()), token, uid))
         cur.commit()
         return True
@@ -126,14 +127,14 @@ def getUserDate():
                 user = getUsername(
                     User_ID).fetchall()  # Fetch the details(userid and username) of the user form users table.
                 return render_template('error.html',
-                                       message=f'Hello, {user[0]}!! Your Token is Not Expired Yet!')  # if token is not expired yet.
+                                       message=f'Hello, {user[0][0].title()}!! Your Token is Not Expired Yet!')  # if token is not expired yet.
             else:
                 updateToken(Token, User_ID)
                 return render_template('error.html', message='Your Token is updated!')
         else:  # New User so Insert details of the user into the db
             try:
                 params = (User_ID, name)
-                cur.execute("INSERT INTO Users (UserID, Username) VALUES(?, ?)", params)  # If new user, insert into db.
+                db.execute("INSERT INTO Users (UserID, Username) VALUES(?, ?)", params)  # If new user, insert into db.
                 cur.commit()
                 Expiry = generateToken(presentTime).strftime("%m/%d/%Y, %H:%M:%S").replace(',',
                                                                                            '')  # converting into string from datetime object for incompatability for storing the data in db.
@@ -145,3 +146,19 @@ def getUserDate():
                                        message=f'UserID is already exists. Try changing with other UserID.')
     else:
         return render_template('homepage.html')  # This fires when the request is get itself.
+
+
+@app.route("/delete_token", methods = ["GET", "POST"])
+def delete_token():
+    if request.method == 'POST':
+        token = request.form.get('token')
+        rows = db.execute("SELECT * FROM Tokens WHERE TokenID = ?", (token, ))
+        rows = rows.fetchall()
+    
+        if not rows:
+            return render_template("error.html", message=f"No Token found with the TokenID {token}")
+    
+        rows = db.execute('DELETE FROM Tokens WHERE TokenID = ?', (token, ))
+        return render_template("error.html", message="Successfully Deleted the Token!")
+    else:
+        return render_template("deletetoken.html")

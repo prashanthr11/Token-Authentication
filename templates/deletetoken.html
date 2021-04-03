@@ -1,0 +1,16 @@
+{% extends "template.html" %}
+
+{% block title %}
+    Delete Token
+{% endblock %}
+
+{% block main %}
+    <form action="/delete_token" method="post" align="center">
+        <div class="form-group">
+            <label for="token"> <b> Token: </b>
+            <input class="form-control" name="token" placeholder="Enter Token" id = "token" type="text" required>
+             </label>
+        </div>
+        <button class="btn btn-primary" type="submit">Delete Token</button>
+    </form>
+{% endblock %}
